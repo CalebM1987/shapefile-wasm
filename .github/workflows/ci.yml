@@ -1,0 +1,108 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Explicit least privilege. Without this the job inherits the repository or org
+# default, which may be read-write — more than any test run needs.
+permissions:
+  contents: read
+
+# Cancel superseded runs on the same branch; only the newest matters.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # With squash merges the PR title becomes the commit message on main, and that
+  # is what release-please parses. A title it cannot read is a release that
+  # quietly does not happen, so check it here rather than discover it later.
+  commit-convention:
+    name: Conventional commit
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Check the pull request title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" > "$RUNNER_TEMP/title" && .githooks/commit-msg "$RUNNER_TEMP/title"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4360b52568e2003a75bf9bc1d59f33a8e3fc893c # stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2
+
+      - name: Install wasm-pack
+        uses: taiki-e/install-action@1ed6d7be6168f6c9046541087ff549b6bc581fdf # v2
+        with:
+          tool: wasm-pack
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Rust first: it is the fastest signal and everything else depends on it.
+      - name: Rust tests
+        run: cargo test
+
+      - name: Rust formatting
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Build (wasm + TypeScript)
+        run: npm run build
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Check package.json and Cargo.toml agree
+        run: npm run check:versions
+
+      - name: TypeScript tests
+        run: npm run test:ts
+
+      # Catches a missing entry point or a stale "files" list before publish.
+      - name: Verify the package contents
+        run: npm pack --dry-run
+
+      # Only runtime dependencies matter to consumers. Dev-tool advisories are
+      # worth knowing about but must not block a release, so they are reported
+      # without failing the job.
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev --audit-level=low
+
+      - name: Audit dev dependencies (advisory only)
+        run: npm audit || true
+        continue-on-error: true
+
+      - name: Audit Rust dependencies
+        uses: taiki-e/install-action@1ed6d7be6168f6c9046541087ff549b6bc581fdf # v2
+        with:
+          tool: cargo-audit
+
+      - name: cargo audit
+        run: cargo audit
