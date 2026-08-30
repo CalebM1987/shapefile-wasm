@@ -1,0 +1,101 @@
+{
+  "name": "@crmackey/shapefile-wasm",
+  "version": "0.1.0",
+  "description": "Read and write ESRI Shapefiles from GeoJSON in the browser, Node and workers. Rust core compiled to WebAssembly.",
+  "keywords": [
+    "shapefile",
+    "shp",
+    "dbf",
+    "geojson",
+    "gis",
+    "wasm",
+    "webassembly",
+    "rust",
+    "esri",
+    "arcgis"
+  ],
+  "license": "MIT",
+  "author": "crmackey",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crmackey/shapefile-wasm.git"
+  },
+  "type": "module",
+  "sideEffects": [
+    "./dist/index.js"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./slim": {
+      "types": "./dist/slim.d.ts",
+      "default": "./dist/slim.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
+    "./projections": {
+      "types": "./dist/generated/projections.d.ts",
+      "default": "./dist/generated/projections.js"
+    },
+    "./wasm": "./pkg/shapefile_wasm_bg.wasm",
+    "./shapefile_wasm_bg.wasm": "./pkg/shapefile_wasm_bg.wasm",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "pkg/shapefile_wasm.js",
+    "pkg/shapefile_wasm.d.ts",
+    "pkg/shapefile_wasm_bg.wasm",
+    "pkg/shapefile_wasm_bg.wasm.d.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "npm run build:wasm && npm run build:inline && npm run build:ts",
+    "build:wasm": "wasm-pack build --target web --out-dir pkg --out-name shapefile_wasm",
+    "build:inline": "node scripts/inline-wasm.mjs",
+    "build:ts": "tsc -p tsconfig.build.json && node scripts/copy-runtime.mjs",
+    "projections": "node scripts/fetch-projections.mjs",
+    "test": "npm run test:rust && npm run build && npm run test:ts",
+    "test:rust": "cargo test",
+    "test:ts": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "check:versions": "node scripts/check-versions.mjs",
+    "docs:dev": "npm run docs:api && npm run docs:rust:dev && vitepress dev docs",
+    "docs:build": "npm run docs:api && vitepress build docs && npm run docs:rust",
+    "docs:preview": "vitepress preview docs",
+    "docs:api": "node scripts/sync-changelog.mjs && typedoc",
+    "docs:rust": "node scripts/build-rust-docs.mjs",
+    "docs:rust:dev": "node scripts/build-rust-docs.mjs --dev",
+    "hooks:install": "node scripts/install-hooks.mjs",
+    "clean": "rm -rf dist pkg target src/generated/wasm-inline.ts",
+    "prepare": "node scripts/install-hooks.mjs",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "happy-dom": "^20.12.0",
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.0",
+    "typedoc-vitepress-theme": "^1.1.3",
+    "typescript": "^5.6.0",
+    "vitepress": "^1.6.4",
+    "vitest": "^4.1.11"
+  }
+}

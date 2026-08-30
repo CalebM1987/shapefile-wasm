@@ -1,0 +1,54 @@
+[package]
+name = "shapefile-wasm"
+version = "0.1.0" # x-release-please-version
+edition = "2021"
+rust-version = "1.85"
+description = "Write ESRI Shapefiles from GeoJSON, entirely in WebAssembly"
+license = "MIT"
+repository = "https://github.com/crmackey/shapefile-wasm"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "rust/lib.rs"
+
+[dependencies]
+shapefile = "0.9"
+# `yore` adds the legacy single-byte code pages that older .dbf files use.
+dbase = { version = "0.8", features = ["yore"] }
+yore = "1.0"
+wasm-bindgen = "0.2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+serde-wasm-bindgen = "0.6"
+thiserror = "2"
+console_error_panic_hook = "0.1.7"
+
+# `dbase` stamps the .dbf header with today's date, which reaches
+# `SystemTime::now()` — unimplemented on wasm32-unknown-unknown, so it aborts the
+# module. The `time` crate reads the clock from JS instead when this feature is
+# on, and Cargo's feature unification applies it to dbase's copy of the crate.
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+time = { version = "0.3", default-features = false, features = ["wasm-bindgen"] }
+
+[dev-dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+
+# The wasm-opt that wasm-pack ships defaults to an older feature set than the
+# Rust toolchain emits, so the post-processing features have to be named.
+# All of these are baseline in every browser since 2021 and Node 16.
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = [
+    "-Oz",
+    "--enable-bulk-memory",
+    "--enable-nontrapping-float-to-int",
+    "--enable-sign-ext",
+    "--enable-mutable-globals",
+    "--enable-reference-types",
+]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

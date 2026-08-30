@@ -1,0 +1,79 @@
+# ---- Build output ----------------------------------------------------------
+# Compiled TypeScript. Rebuilt by `npm run build`.
+/dist/
+
+# wasm-pack output. Rebuilt by `npm run build:wasm`; the .wasm is a binary that
+# would bloat history, and every checkout can regenerate it from rust/.
+/pkg/
+
+# Rust build artifacts.
+/target/
+
+# Documentation site. The hand-written guide under docs/guide/ and the VitePress
+# config ARE tracked; only generated output is ignored.
+/docs/.vitepress/dist/
+/docs/.vitepress/cache/
+/docs/reference/
+/docs/public/rust/
+# Mirrored from the root CHANGELOG.md, which release-please owns.
+/docs/guide/changelog.md
+
+# ---- Generated sources -----------------------------------------------------
+# The base64-embedded wasm binary and the copied wasm-bindgen glue. Both are
+# produced by scripts/inline-wasm.mjs during the build.
+/src/generated/wasm-inline.ts
+/src/generated/bindings.js
+/src/generated/bindings.d.ts
+
+# NOTE: src/generated/projections.ts is deliberately NOT ignored. It is baked
+# from epsg.io by `npm run projections` and committed on purpose, so builds
+# never depend on that service being reachable.
+
+# ---- Dependencies ----------------------------------------------------------
+node_modules/
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/versions
+
+# Lockfiles: package-lock.json and Cargo.lock are committed on purpose so CI and
+# contributors resolve identical dependency trees.
+
+# ---- Test and tooling caches -----------------------------------------------
+coverage/
+.vitest/
+*.tsbuildinfo
+.eslintcache
+
+# ---- Editors and OS --------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ---- Local environment -----------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# Registry credentials. A project-level .npmrc is a normal thing to create and a
+# very easy way to commit an auth token by accident.
+.npmrc
+.yarnrc
+.yarnrc.yml
+
+# Personal Claude Code overrides. .claude/settings.json is committed so the team
+# shares one permission allowlist.
+.claude/settings.local.json
+
+# ---- Scratch ---------------------------------------------------------------
+*.log
+npm-debug.log*
+tmp/
+scratch/
