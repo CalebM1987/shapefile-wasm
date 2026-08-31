@@ -1,0 +1,13 @@
+# The library lives at the workspace root; the demo is a member that links it
+# with `workspace:*`, so one install serves both and there is one lockfile.
+packages:
+  - demo
+
+# pnpm does not run dependency install scripts unless they are approved here —
+# a better default than npm's, and worth keeping given this package publishes to
+# npm. esbuild's postinstall links its platform binary, which Vite and Vitest
+# need. Nothing else in the tree runs anything at install time.
+#
+# Managed with `pnpm approve-builds`; review anything new that appears.
+allowBuilds:
+  esbuild: true

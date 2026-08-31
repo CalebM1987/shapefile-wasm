@@ -56,12 +56,16 @@ jobs:
         with:
           tool: wasm-pack
 
+      - name: Set up pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       # Rust first: it is the fastest signal and everything else depends on it.
       - name: Rust tests
@@ -74,29 +78,29 @@ jobs:
         run: cargo clippy --all-targets -- -D warnings
 
       - name: Build (wasm + TypeScript)
-        run: npm run build
+        run: pnpm run build
 
       - name: Type-check
-        run: npm run typecheck
+        run: pnpm run typecheck
 
       - name: Check package.json and Cargo.toml agree
-        run: npm run check:versions
+        run: pnpm run check:versions
 
       - name: TypeScript tests
-        run: npm run test:ts
+        run: pnpm run test:ts
 
       # Catches a missing entry point or a stale "files" list before publish.
       - name: Verify the package contents
-        run: npm pack --dry-run
+        run: pnpm pack --dry-run
 
       # Only runtime dependencies matter to consumers. Dev-tool advisories are
       # worth knowing about but must not block a release, so they are reported
       # without failing the job.
       - name: Audit runtime dependencies
-        run: npm audit --omit=dev --audit-level=low
+        run: pnpm audit --prod --audit-level low
 
       - name: Audit dev dependencies (advisory only)
-        run: npm audit || true
+        run: pnpm audit || true
         continue-on-error: true
 
       - name: Audit Rust dependencies

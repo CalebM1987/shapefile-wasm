@@ -6,8 +6,9 @@
  * through `docs/public/`. Letting one Vite build process another's output
  * produces duplicated assets and rewritten URLs.
  *
- * The demo is built with a base path so its assets resolve under `/demo/`,
- * wherever the docs site itself is served from.
+ * The base is handed over as `DEMO_BASE` rather than a CLI flag: the demo's
+ * build script chains a type-check before Vite, and trailing arguments would
+ * attach to the wrong half of it.
  */
 import { spawnSync } from 'node:child_process';
 import { cp, mkdir, rm } from 'node:fs/promises';
@@ -28,9 +29,7 @@ const dev = process.argv.includes('--dev');
 const STAGED = dev ? resolve(ROOT, 'docs/public/app') : resolve(ROOT, 'docs/.vitepress/dist/app');
 
 if (!existsSync(resolve(DEMO, 'node_modules'))) {
-  console.error(
-    'demo/node_modules is missing. Run `npm --prefix demo ci` (or `install`) first.',
-  );
+  console.error('demo/node_modules is missing. Run `pnpm install` at the workspace root.');
   process.exit(1);
 }
 
@@ -38,10 +37,11 @@ if (!existsSync(resolve(DEMO, 'node_modules'))) {
 const docsBase = process.env.DOCS_BASE ?? '/';
 const base = `${docsBase.replace(/\/+$/, '')}/app/`;
 
-const build = spawnSync('npm', ['run', 'build', '--', '--base', base], {
+const build = spawnSync('pnpm', ['run', 'build'], {
   cwd: DEMO,
   stdio: 'inherit',
-  env: { ...process.env },
+  shell: process.platform === 'win32',
+  env: { ...process.env, DEMO_BASE: base },
 });
 
 if (build.status !== 0) {

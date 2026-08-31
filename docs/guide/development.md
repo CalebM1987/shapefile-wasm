@@ -6,6 +6,7 @@
   required by `dbase`.
 - **wasm-pack**
 - **Node** 18+
+- **pnpm** 11+ (`corepack enable pnpm`, or install it however you prefer)
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
@@ -15,23 +16,37 @@ curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
 
 git clone https://github.com/crmackey/shapefile-wasm
 cd shapefile-wasm
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
+
+## The workspace
+
+This is a pnpm workspace. The library is the root package; `demo/` is a member
+that links it with `workspace:*`. One `pnpm install` at the root covers both,
+and there is a single `pnpm-lock.yaml` — the demo does not have its own.
+
+That linkage is why the demo always builds against your working tree rather than
+a published copy, and why `pnpm run build` has to run before the demo does.
+
+pnpm refuses to run dependency install scripts unless they are approved in
+`pnpm-workspace.yaml`. Only `esbuild` is, for the platform binary Vite and
+Vitest need. If a dependency update makes pnpm ask about a new one, look at what
+the script actually does before running `pnpm approve-builds`.
 
 ## Scripts
 
 | Script | Does |
 | --- | --- |
-| `npm run build` | The three build stages below, in order |
-| `npm run build:wasm` | `wasm-pack` compiles `rust/` into `pkg/` |
-| `npm run build:inline` | Embeds the `.wasm` as base64, copies the glue into `src/generated/` |
-| `npm run build:ts` | `tsc` into `dist/`, then copies the runtime glue across |
-| `npm run typecheck` | Type-check without emitting |
-| `npm run test` | Rust tests, a build, then the TypeScript suite |
-| `npm run docs:dev` | This site, with hot reload |
-| `npm run projections` | Re-scrape the EPSG table from epsg.io |
-| `npm run clean` | Remove all build output and generated sources |
+| `pnpm run build` | The three build stages below, in order |
+| `pnpm run build:wasm` | `wasm-pack` compiles `rust/` into `pkg/` |
+| `pnpm run build:inline` | Embeds the `.wasm` as base64, copies the glue into `src/generated/` |
+| `pnpm run build:ts` | `tsc` into `dist/`, then copies the runtime glue across |
+| `pnpm run typecheck` | Type-check without emitting |
+| `pnpm run test` | Rust tests, a build, then the TypeScript suite |
+| `pnpm run docs:dev` | This site, with hot reload |
+| `pnpm run projections` | Re-scrape the EPSG table from epsg.io |
+| `pnpm run clean` | Remove all build output and generated sources |
 
 ## Two load-bearing bits of Cargo.toml
 
@@ -92,7 +107,7 @@ The panic message and a demangled Rust stack then go to `console.error`.
 ## Regenerating the projection table
 
 ```bash
-npm run projections
+pnpm run projections
 ```
 
 Scrapes [epsg.io](https://epsg.io) for the codes listed in

@@ -22,7 +22,7 @@ console.log(layers[0].geojson.features.length);
 
 📖 **[Full documentation](https://crmackey.github.io/shapefile-wasm/)** — guide,
 TypeScript API reference and Rust API reference in one searchable site. Run it
-locally with `npm run docs:dev`; see [Documentation](#documentation).
+locally with `pnpm run docs:dev`; see [Documentation](#documentation).
 
 ---
 
@@ -257,7 +257,7 @@ that looks fine until someone opens it in the wrong coordinate system is a much
 worse outcome than a failed export.
 
 The table is baked in at authoring time from [epsg.io](https://epsg.io) by
-`npm run projections`, and committed. The published package never makes a
+`pnpm run projections`, and committed. The published package never makes a
 network request.
 
 ## Multiple layers
@@ -408,30 +408,30 @@ npm install
 ### Build
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 Three stages, individually runnable:
 
 | Script | Does |
 | --- | --- |
-| `npm run build:wasm` | `wasm-pack` compiles `rust/` to `pkg/` |
-| `npm run build:inline` | Embeds the `.wasm` as base64, copies the glue into `src/generated/` |
-| `npm run build:ts` | `tsc` to `dist/`, then copies the runtime glue across |
+| `pnpm run build:wasm` | `wasm-pack` compiles `rust/` to `pkg/` |
+| `pnpm run build:inline` | Embeds the `.wasm` as base64, copies the glue into `src/generated/` |
+| `pnpm run build:ts` | `tsc` to `dist/`, then copies the runtime glue across |
 
 Other scripts:
 
 | Script | Does |
 | --- | --- |
-| `npm run typecheck` | Type-check without emitting |
-| `npm run test` | Rust tests, a build, then the TypeScript suite |
-| `npm run docs:dev` | Documentation site with hot reload — see [Documentation](#documentation) |
-| `npm run docs:build` | Build the documentation site into `docs/.vitepress/dist` |
-| `npm run docs:preview` | Serve what `docs:build` produced |
-| `npm run docs:api` | Regenerate the TypeScript reference only |
-| `npm run docs:rust` | Regenerate the Rust reference only |
-| `npm run projections` | Re-scrape the EPSG table from epsg.io (rarely needed) |
-| `npm run clean` | Remove `dist/`, `pkg/`, `target/` and generated sources |
+| `pnpm run typecheck` | Type-check without emitting |
+| `pnpm run test` | Rust tests, a build, then the TypeScript suite |
+| `pnpm run docs:dev` | Documentation site with hot reload — see [Documentation](#documentation) |
+| `pnpm run docs:build` | Build the documentation site into `docs/.vitepress/dist` |
+| `pnpm run docs:preview` | Serve what `docs:build` produced |
+| `pnpm run docs:api` | Regenerate the TypeScript reference only |
+| `pnpm run docs:rust` | Regenerate the Rust reference only |
+| `pnpm run projections` | Re-scrape the EPSG table from epsg.io (rarely needed) |
+| `pnpm run clean` | Remove `dist/`, `pkg/`, `target/` and generated sources |
 
 ### A note on the wasm build
 
@@ -451,16 +451,16 @@ Two things in `Cargo.toml` are load-bearing and easy to undo by accident:
 ## Testing
 
 ```bash
-npm test                # Rust tests, then a build, then the TypeScript suite
+pnpm test               # Rust tests, then a build, then the TypeScript suite
 ```
 
 Individually:
 
 ```bash
-npm run test:rust       # cargo test — conversion rules, schema inference
-npm run test:ts         # vitest — the wasm boundary, zip layer, public API
-npm run test:watch      # vitest in watch mode
-npm run test:coverage   # vitest with a v8 coverage report
+pnpm run test:rust       # cargo test — conversion rules, schema inference
+pnpm run test:ts         # vitest — the wasm boundary, zip layer, public API
+pnpm run test:watch      # vitest in watch mode
+pnpm run test:coverage   # vitest with a v8 coverage report
 ```
 
 The TypeScript suites run against `src/`, so no build is needed while iterating.
@@ -493,9 +493,9 @@ site.
 ### Running it
 
 ```bash
-npm run docs:dev       # live site with hot reload at http://localhost:5173
-npm run docs:build     # static site into docs/.vitepress/dist
-npm run docs:preview   # serve what docs:build produced
+pnpm run docs:dev       # live site with hot reload at http://localhost:5173
+pnpm run docs:build     # static site into docs/.vitepress/dist
+pnpm run docs:preview   # serve what docs:build produced
 ```
 
 `docs:dev` and `docs:build` regenerate both API references first, so a single
@@ -503,15 +503,15 @@ command is enough — there is no separate step to remember.
 
 > [!NOTE]
 > The Rust reference needs the Rust toolchain installed. Everything else builds
-> with Node alone — `npm run docs:api && npx vitepress dev docs` skips it.
+> with Node alone — `pnpm run docs:api && npx vitepress dev docs` skips it.
 
 ### What it is assembled from
 
 | Part | Comes from | Script |
 | --- | --- | --- |
 | Guide | Hand-written markdown in `docs/guide/` | — |
-| TypeScript reference | TypeDoc, from the TSDoc comments in `src/` | `npm run docs:api` |
-| Rust reference | `cargo doc`, from the `///` comments in `rust/` | `npm run docs:rust` |
+| TypeScript reference | TypeDoc, from the TSDoc comments in `src/` | `pnpm run docs:api` |
+| Rust reference | `cargo doc`, from the `///` comments in `rust/` | `pnpm run docs:rust` |
 
 TypeDoc emits **markdown** rather than HTML, so the TypeScript reference renders
 as ordinary VitePress pages — themed like the guide and covered by the site's
@@ -571,7 +571,7 @@ Four workflows in `.github/workflows/`:
 
 | Workflow | Runs on | Does |
 | --- | --- | --- |
-| `ci.yml` | Push to `main`, every PR | Conventional PR title, `cargo test`, `fmt --check`, `clippy -D warnings`, build, `tsc --noEmit`, version consistency, `vitest`, `npm pack --dry-run`, `npm audit`, `cargo audit` |
+| `ci.yml` | Push to `main`, every PR | Conventional PR title, `cargo test`, `fmt --check`, `clippy -D warnings`, build, `tsc --noEmit`, version consistency, `vitest`, `ppnpm pack --dry-run`, `npm audit`, `cargo audit` |
 | `release-please.yml` | Push to `main` | Maintains the release PR; tags a GitHub Release when it merges |
 | `docs.yml` | Push to `main` | Builds the documentation site and deploys it to GitHub Pages |
 | `publish.yml` | A published GitHub release | Re-runs the tests, checks the tag matches, publishes to npm with provenance |
@@ -592,8 +592,8 @@ or moving to a custom domain does not quietly break the CSS.
 Locally the base stays `/`. To preview exactly what Pages will serve:
 
 ```bash
-DOCS_BASE=/shapefile-wasm/ npm run docs:build
-npm run docs:preview
+DOCS_BASE=/shapefile-wasm/ pnpm run docs:build
+pnpm run docs:preview
 ```
 
 ### Publishing a release

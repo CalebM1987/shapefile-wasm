@@ -78,7 +78,7 @@ worse failure than an export that stops and tells you.
 ## Where the definitions come from
 
 They are scraped from [epsg.io](https://epsg.io) at authoring time by
-`npm run projections`, written into `src/generated/projections.ts`, and
+`pnpm run projections`, written into `src/generated/projections.ts`, and
 **committed**.
 
 The published package never makes a network request. A `.prj` fetched at runtime
@@ -86,7 +86,7 @@ can fail quietly and leave an export with no projection at all, and builds shoul
 not depend on a free service staying reachable.
 
 To add codes, edit the `CODES` list in `scripts/fetch-projections.mjs` and re-run
-`npm run projections`.
+`pnpm run projections`.
 
 ## Fetching from epsg.io
 

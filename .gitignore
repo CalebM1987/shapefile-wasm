@@ -40,8 +40,12 @@ node_modules/
 !.yarn/plugins
 !.yarn/versions
 
-# Lockfiles: package-lock.json and Cargo.lock are committed on purpose so CI and
-# contributors resolve identical dependency trees.
+# Lockfiles: pnpm-lock.yaml and Cargo.lock are committed on purpose so CI and
+# contributors resolve identical dependency trees. There is one pnpm lockfile
+# for the whole workspace — the demo does not have its own.
+
+# pnpm's virtual store lives inside node_modules, which is already ignored.
+.pnpm-store/
 
 # ---- Test and tooling caches -----------------------------------------------
 coverage/

@@ -33,13 +33,21 @@ crate. Do not reach for a Rust crate to do something TypeScript can do.
 ## Before you start
 
 ```bash
-npm install          # also installs the git hooks
-npm run build        # wasm → inline → TypeScript
-npm test             # Rust tests, build, TypeScript tests
+pnpm install         # both workspace packages, and the git hooks
+pnpm run build       # wasm → inline → TypeScript
+pnpm test            # Rust tests, build, TypeScript tests
 ```
 
-You need Rust 1.85+ with the `wasm32-unknown-unknown` target, wasm-pack, and
-Node 18+. See [Development](https://crmackey.github.io/shapefile-wasm/guide/development).
+You need Rust 1.85+ with the `wasm32-unknown-unknown` target, wasm-pack, pnpm,
+and Node 18+.
+
+This is a pnpm workspace: the library is the root, `demo/` is a member linking
+it with `workspace:*`. Do not add a lockfile to `demo/` — there is one for the
+workspace. New dependencies that want to run install scripts must be approved in
+`pnpm-workspace.yaml`; check what the script does before approving it.
+
+See [Development](https://crmackey.github.io/shapefile-wasm/guide/development)
+for the full setup.
 
 ---
 
@@ -126,7 +134,7 @@ commitlint.
 ## Commits and releases
 
 **Conventional Commits are enforced** by `.githooks/commit-msg`, installed
-automatically by `npm install`. CI also checks pull request titles, because a
+automatically by `pnpm install`. CI also checks pull request titles, because a
 squash merge turns the title into the commit message on `main`.
 
 ```
@@ -161,7 +169,7 @@ This package parses untrusted input and publishes to npm. Both matter.
   mint an OIDC token, and neither runs on pull requests.
 - npm publishing uses **Trusted Publishing** — there is no long-lived npm token.
   Do not add one.
-- `package.json` uses a `files` allowlist. Check `npm pack --dry-run` after
+- `package.json` uses a `files` allowlist. Check `pnpm pack --dry-run` after
   changing what the build emits.
 
 See [SECURITY.md](./SECURITY.md).
@@ -176,12 +184,12 @@ CI runs all of these; running them first saves a round trip.
 cargo test                              # Rust unit tests
 cargo fmt --check                       # formatting
 cargo clippy --all-targets -- -D warnings
-npm run build                           # wasm + TypeScript
-npm run typecheck                       # tsc --noEmit
-npm run check:versions                  # package.json vs Cargo.toml
-npm run test:ts                         # vitest
-npm run docs:api                        # TypeDoc; warnings are failures
-npm pack --dry-run                      # what would ship
+pnpm run build                          # wasm + TypeScript
+pnpm run typecheck                      # tsc --noEmit
+pnpm run check:versions                 # package.json vs Cargo.toml
+pnpm run test:ts                        # vitest
+pnpm run docs:api                        # TypeDoc; warnings are failures
+pnpm pack --dry-run                      # what would ship
 ```
 
 TypeScript is strict, including `exactOptionalPropertyTypes` — so build option
@@ -214,13 +222,13 @@ compiler points at what is missing.
 **Adding EPSG codes to the bundled table**
 
 Edit the `CODES` list in `scripts/fetch-projections.mjs` and run
-`npm run projections`. The result is committed on purpose — the published
+`pnpm run projections`. The result is committed on purpose — the published
 package must never depend on epsg.io being reachable.
 
 **Changing what the package ships**
 
 Update the `files` array in `package.json`, then verify with
-`npm pack --dry-run`. The `files` allowlist takes precedence over `.gitignore`,
+`pnpm pack --dry-run`. The `files` allowlist takes precedence over `.gitignore`,
 so gitignored build output still ships — that is intended for `dist/` and `pkg/`.
 
 ---
@@ -249,7 +257,7 @@ so gitignored build output still ships — that is intended for `dist/` and `pkg
   `build_with_dest` rather than `bind_to`, `finalize()` returning `()` rather
   than the cursor.
 - **Run the checks.** Do not report work as done on the strength of it looking
-  right. `cargo test` and `npm run test:ts` are fast.
+  right. `cargo test` and `pnpm run test:ts` are fast.
 - **Watch for truncated output.** A `curl` piped through `head` can cut off the
   status line and lead you to the wrong conclusion about an API's behaviour.
 - **Do not weaken a test to make it pass.** If a test fails, decide whether the

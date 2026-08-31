@@ -1,7 +1,7 @@
 # Testing
 
 ```bash
-npm test
+pnpm test
 ```
 
 Runs the Rust tests, then a full build, then the TypeScript suite.
@@ -9,10 +9,10 @@ Runs the Rust tests, then a full build, then the TypeScript suite.
 ## Running them individually
 
 ```bash
-npm run test:rust      # cargo test
-npm run test:ts        # vitest run
-npm run test:watch     # vitest, watch mode
-npm run test:coverage  # vitest with a v8 coverage report
+pnpm run test:rust      # cargo test
+pnpm run test:ts        # vitest run
+pnpm run test:watch     # vitest, watch mode
+pnpm run test:coverage  # vitest with a v8 coverage report
 ```
 
 The TypeScript suites import from `src/`, so no build is needed while iterating.
@@ -89,7 +89,7 @@ better failure message than reaching through WebAssembly.
 ## Coverage
 
 ```bash
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 Generated sources and `src/types.ts` are excluded — the first is machine-written,
