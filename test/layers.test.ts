@@ -186,6 +186,24 @@ describe('round-tripping', () => {
     );
   });
 
+  it('reads back a nested layout, which is a zip of zips', async () => {
+    // The outer archive holds no .shp of its own, so the reader has to descend
+    // into the inner archives. Anything writeLayersZip emits must read back.
+    const zip = await writeLayersZip(NETWORK, { layout: 'nested', epsg: 4326 });
+    const layers = await readShapefileZip(zip);
+
+    expect(layers.map((l) => l.name)).toEqual(['Basins', 'StormManholes', 'StormPipes']);
+    expect(layers.find((l) => l.name === 'StormManholes')!.geojson.features).toHaveLength(3);
+    expect(layers[0]!.prj).toMatch(/GCS_WGS_1984/);
+  });
+
+  it('reads a nested layout that also sits in a folder', async () => {
+    const zip = await writeLayersZip(NETWORK, { layout: 'nested', folder: 'export' });
+    const layers = await readShapefileZip(zip);
+
+    expect(layers).toHaveLength(3);
+  });
+
   it('reads back a folders layout', async () => {
     const zip = await writeLayersZip(NETWORK, { layout: 'folders' });
     const layers = await readShapefileZip(zip);

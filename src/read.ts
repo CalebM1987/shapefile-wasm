@@ -77,6 +77,9 @@ export async function readShapefile(
  * in folders, so components are grouped by their full path minus extension.
  * `a/roads.shp` and `b/roads.shp` therefore stay separate layers.
  *
+ * Archives nested one level deep are descended into, so an archive written with
+ * `layout: 'nested'` — one `.zip` per layer — reads back the same as any other.
+ *
  * Each layer is decoded using its own `.cpg`, and carries its own `.prj`.
  * Directory entries, `__MACOSX/` resource forks and files with no matching
  * `.shp` are ignored.
@@ -105,6 +108,30 @@ export async function readShapefileZip(
   archive: Uint8Array,
   options: ReadOptions = {},
 ): Promise<ShapefileLayer[]> {
+  const layers = await readArchive(archive, options, 0);
+
+  if (layers.length === 0) {
+    throw new Error('shapefile-wasm: the archive contains no .shp file.');
+  }
+
+  return layers.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
+ * How far to descend into archives nested inside archives.
+ *
+ * One level covers the `nested` layout this package writes and the
+ * zip-of-zips that GIS portals hand out. Anything deeper is more likely to be
+ * a zip bomb than a layer.
+ */
+const MAX_NESTING = 1;
+
+/** Reads one archive, recursing into any archives it contains. @internal */
+async function readArchive(
+  archive: Uint8Array,
+  options: ReadOptions,
+  depth: number,
+): Promise<ShapefileLayer[]> {
   const files = unzipSync(archive);
   const decoder = new TextDecoder();
 
@@ -127,6 +154,22 @@ export async function readShapefileZip(
 
   const layers: ShapefileLayer[] = [];
 
+  // A `nested` archive holds one .zip per layer and no .shp of its own, so an
+  // archive that writeLayersZip produced has to be readable back.
+  if (depth < MAX_NESTING) {
+    for (const [path, bytes] of Object.entries(files)) {
+      if (path.endsWith('/') || path.includes('__MACOSX/')) continue;
+      if (!/\.zip$/i.test(path)) continue;
+
+      try {
+        layers.push(...(await readArchive(bytes, options, depth + 1)));
+      } catch {
+        // An inner entry that is not a readable archive is not a reason to
+        // fail the outer one; it may just be an unrelated file.
+      }
+    }
+  }
+
   for (const [stem, group] of groups) {
     // A .dbf or .prj with no .shp beside it is not a layer.
     if (!group.shp) continue;
@@ -146,11 +189,7 @@ export async function readShapefileZip(
     });
   }
 
-  if (layers.length === 0) {
-    throw new Error('shapefile-wasm: the archive contains no .shp file.');
-  }
-
-  return layers.sort((a, b) => a.name.localeCompare(b.name));
+  return layers;
 }
 
 /**

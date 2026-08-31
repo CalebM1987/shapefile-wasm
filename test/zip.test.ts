@@ -153,6 +153,26 @@ describe('reading archives', () => {
     expect(layer!.geojson.features[0]!.properties).toEqual({});
   });
 
+  it('ignores an inner archive that is not a readable zip', async () => {
+    const entries = unzipSync(await writeShapefileZip(CITIES, { fileName: 'cities' }));
+    const polluted = zipSync({
+      ...entries,
+      'notes.zip': new TextEncoder().encode('this is not a zip'),
+    });
+
+    const layers = await readShapefileZip(polluted);
+    expect(layers.map((l) => l.name)).toEqual(['cities']);
+  });
+
+  it('does not descend more than one level into nested archives', async () => {
+    // Guards against a zip bomb: an archive nested three deep is not followed.
+    const inner = await writeShapefileZip(CITIES, { fileName: 'cities' });
+    const middle = zipSync({ 'inner.zip': inner });
+    const outer = zipSync({ 'middle.zip': middle });
+
+    await expect(readShapefileZip(outer)).rejects.toThrow(/no \.shp file/);
+  });
+
   it('reports an archive with no shapefile in it', async () => {
     const bogus = zipSync({ 'readme.txt': new TextEncoder().encode('nothing here') });
     await expect(readShapefileZip(bogus)).rejects.toThrow(/no \.shp file/);
