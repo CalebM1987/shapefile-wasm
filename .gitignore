@@ -14,7 +14,7 @@
 /docs/.vitepress/dist/
 /docs/.vitepress/cache/
 /docs/reference/
-/docs/public/rust/
+/docs/public/rustdoc/
 /docs/public/app/
 /demo/dist/
 # Mirrored from the root CHANGELOG.md, which release-please owns.

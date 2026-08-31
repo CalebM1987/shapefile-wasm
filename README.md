@@ -515,8 +515,9 @@ command is enough — there is no separate step to remember.
 
 TypeDoc emits **markdown** rather than HTML, so the TypeScript reference renders
 as ordinary VitePress pages — themed like the guide and covered by the site's
-local search. `cargo doc` emits its own self-contained static site, which is
-copied into the build and served at `/rust/`.
+local search. `cargo doc` and the demo are each their own static site, copied
+into the build afterwards and embedded by a real VitePress page (`/rust` and
+`/demo`) so the router resolves them like anything else.
 
 The same comments are what your editor shows on hover.
 

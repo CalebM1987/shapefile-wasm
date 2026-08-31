@@ -74,8 +74,12 @@ jobs:
         env:
           DOCS_BASE: ${{ steps.base.outputs.value }}
 
-      - name: Check the demo was staged
-        run: test -f docs/.vitepress/dist/app/index.html
+      # Both are copied in after vitepress build, so a silent failure there
+      # would otherwise ship a site with two dead sections.
+      - name: Check the demo and Rust docs were staged
+        run: |
+          test -f docs/.vitepress/dist/app/index.html
+          test -f docs/.vitepress/dist/rustdoc/shapefile_wasm/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3

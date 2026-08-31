@@ -50,8 +50,7 @@ export default defineConfig({
         activeMatch: '/reference/',
         items: [
           { text: 'TypeScript reference', link: '/reference/' },
-          // Static rustdoc output, staged into docs/public by `npm run docs:rust`.
-          { text: 'Rust reference', link: '/rust/', target: '_blank' },
+          { text: 'Rust reference', link: '/rust' },
         ],
       },
       {
@@ -123,5 +122,6 @@ export default defineConfig({
 
   // The generated reference contains links TypeDoc resolves at build time; do
   // not fail the whole build over one of them.
-  ignoreDeadLinks: [/^\/reference\//, /^\/app\//],
+  // Both are separate static sites staged into dist/, outside the router.
+  ignoreDeadLinks: [/^\/reference\//, /^\/app\//, /^\/rustdoc\//],
 });

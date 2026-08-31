@@ -6,9 +6,13 @@
  * `cargo doc` emits a self-contained static site. Where it gets staged depends
  * on what is being run:
  *
- * * `--dev`  -> `docs/public/rust/`, which `vitepress dev` serves at `/rust/`.
- * * default  -> `docs/.vitepress/dist/rust/`, copied in *after* `vitepress
+ * * `--dev`  -> `docs/public/rustdoc/`, which `vitepress dev` serves.
+ * * default  -> `docs/.vitepress/dist/rustdoc/`, copied in *after* `vitepress
  *   build` has finished.
+ *
+ * Staged at /rustdoc/, not /rust/. The page that embeds it renders to
+ * `rust.html`, which cleanUrls serves at /rust, and a host asked for /rust with
+ * both that file and a `rust/` directory present has to guess which to serve.
  *
  * The build case deliberately bypasses `public/`. Rustdoc ships a handful of
  * `.html` license files, and Vite pulls those into its own output as well —
@@ -28,8 +32,8 @@ const CRATE_DOCS = resolve(ROOT, 'target/doc');
 
 const dev = process.argv.includes('--dev');
 const STAGED = dev
-  ? resolve(ROOT, 'docs/public/rust')
-  : resolve(ROOT, 'docs/.vitepress/dist/rust');
+  ? resolve(ROOT, 'docs/public/rustdoc')
+  : resolve(ROOT, 'docs/.vitepress/dist/rustdoc');
 
 const result = spawnSync('cargo', ['doc', '--no-deps'], {
   cwd: ROOT,
@@ -77,4 +81,4 @@ await writeFile(
   'utf8',
 );
 
-console.log(`staged Rust docs at ${STAGED.replace(`${ROOT}/`, '')} (served at /rust/)`);
+console.log(`staged Rust docs at ${STAGED.replace(`${ROOT}/`, '')} (served at /rustdoc/)`);
