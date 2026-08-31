@@ -44,6 +44,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/', activeMatch: '/guide/' },
+      { text: 'Demo', link: '/demo', activeMatch: '/demo' },
       {
         text: 'API',
         activeMatch: '/reference/',
@@ -122,5 +123,5 @@ export default defineConfig({
 
   // The generated reference contains links TypeDoc resolves at build time; do
   // not fail the whole build over one of them.
-  ignoreDeadLinks: [/^\/reference\//],
+  ignoreDeadLinks: [/^\/reference\//, /^\/app\//],
 });

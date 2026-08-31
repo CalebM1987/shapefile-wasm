@@ -40,7 +40,16 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - name: Install dependencies
+        run: npm ci
+
+      # The demo is a separate Vite app with its own lockfile. It links the
+      # package with `file:..`, so the root build has to exist first.
+      - name: Install demo dependencies
+        run: npm ci --prefix demo || npm install --prefix demo
+
+      - name: Build the package
+        run: npm run build
 
       - name: Configure Pages
         id: pages
@@ -57,10 +66,16 @@ jobs:
         env:
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
-      - name: Build documentation
+      # Runs typedoc, vitepress build, cargo doc and the demo build, staging the
+      # last two into dist/ afterwards. DOCS_BASE reaches the demo too, so its
+      # assets resolve under <base>/demo/.
+      - name: Build documentation and demo
         run: npm run docs:build
         env:
           DOCS_BASE: ${{ steps.base.outputs.value }}
+
+      - name: Check the demo was staged
+        run: test -f docs/.vitepress/dist/app/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3
