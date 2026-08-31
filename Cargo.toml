@@ -15,7 +15,7 @@ path = "rust/lib.rs"
 shapefile = "0.9"
 # `yore` adds the legacy single-byte code pages that older .dbf files use.
 dbase = { version = "0.8", features = ["yore"] }
-yore = "1.0"
+yore = "2.1"
 wasm-bindgen = "0.2"
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
