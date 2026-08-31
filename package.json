@@ -73,6 +73,7 @@
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "check:versions": "node scripts/check-versions.mjs",
+    "check:workflows": "node scripts/check-workflows.mjs",
     "demo": "pnpm --filter shapefile-wasm-demo dev",
     "demo:build": "node scripts/build-demo.mjs",
     "demo:build:dev": "node scripts/build-demo.mjs --dev",

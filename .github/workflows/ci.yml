@@ -86,6 +86,12 @@ jobs:
       - name: Check package.json and Cargo.toml agree
         run: pnpm run check:versions
 
+      # Catches a job that runs a build without installing the tool it needs,
+      # an action pinned to a tag instead of a SHA, or a missing permissions
+      # block. All three otherwise surface only as a failed run, or not at all.
+      - name: Check the workflows are self-consistent
+        run: pnpm run check:workflows
+
       - name: TypeScript tests
         run: pnpm run test:ts
 
