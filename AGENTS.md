@@ -46,7 +46,7 @@ it with `workspace:*`. Do not add a lockfile to `demo/` — there is one for the
 workspace. New dependencies that want to run install scripts must be approved in
 `pnpm-workspace.yaml`; check what the script does before approving it.
 
-See [Development](https://crmackey.github.io/shapefile-wasm/guide/development)
+See [Development](https://calebm1987.github.io/shapefile-wasm/guide/development)
 for the full setup.
 
 ---

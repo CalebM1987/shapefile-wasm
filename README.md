@@ -20,7 +20,7 @@ const layers = await readShapefileZip(zip);
 console.log(layers[0].geojson.features.length);
 ```
 
-📖 **[Full documentation](https://crmackey.github.io/shapefile-wasm/)** — guide,
+📖 **[Full documentation](https://calebm1987.github.io/shapefile-wasm/)** — guide,
 TypeScript API reference and Rust API reference in one searchable site. Run it
 locally with `pnpm run docs:dev`; see [Documentation](#documentation).
 
@@ -296,7 +296,7 @@ overwrite, and a layer that fails to convert names itself in the message.
 Use `writeLayers` when you want the per-layer detail — feature counts, field
 renames, skipped features — then `zipLayers` to pack it.
 
-[Full guide →](https://crmackey.github.io/shapefile-wasm/guide/multiple-layers)
+[Full guide →](https://calebm1987.github.io/shapefile-wasm/guide/multiple-layers)
 
 ## Looking up a projection
 
