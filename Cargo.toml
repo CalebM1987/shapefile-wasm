@@ -5,7 +5,7 @@ edition = "2021"
 rust-version = "1.85"
 description = "Write ESRI Shapefiles from GeoJSON, entirely in WebAssembly"
 license = "MIT"
-repository = "https://github.com/crmackey/shapefile-wasm"
+repository = "https://github.com/CalebM1987/shapefile-wasm"
 
 [lib]
 crate-type = ["cdylib", "rlib"]

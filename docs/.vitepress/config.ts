@@ -103,12 +103,12 @@ export default defineConfig({
       '/reference/': referenceSidebar,
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/crmackey/shapefile-wasm' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/CalebM1987/shapefile-wasm' }],
 
     search: { provider: 'local' },
 
     editLink: {
-      pattern: 'https://github.com/crmackey/shapefile-wasm/edit/main/docs/:path',
+      pattern: 'https://github.com/CalebM1987/shapefile-wasm/edit/main/docs/:path',
       text: 'Edit this page on GitHub',
     },
 

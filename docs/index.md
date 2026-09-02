@@ -17,7 +17,7 @@ hero:
       link: /reference/
     - theme: alt
       text: View on GitHub
-      link: https://github.com/crmackey/shapefile-wasm
+      link: https://github.com/CalebM1987/shapefile-wasm
 
 features:
   - title: Both directions

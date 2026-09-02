@@ -82,7 +82,7 @@ for (const layer of layers) {
 }
 ```
 
-The source is in [`demo/`](https://github.com/crmackey/shapefile-wasm/tree/main/demo).
+The source is in [`demo/`](https://github.com/CalebM1987/shapefile-wasm/tree/main/demo).
 
 <style>
 .demo-frame {

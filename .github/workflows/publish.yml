@@ -77,9 +77,27 @@ jobs:
             exit 1
           fi
 
+      # A version already on the registry is not a failure. It happens whenever
+      # a version was published by hand — the first release usually is, since a
+      # trusted publisher can only be configured for a package that exists — and
+      # whenever this workflow is re-run. Skipping keeps the run green instead of
+      # failing on "cannot publish over the previously published version".
+      - name: Skip if this version is already published
+        id: published
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          name="$(node -p "require('./package.json').name")"
+          if npm view "$name@$version" version > /dev/null 2>&1; then
+            echo "$name@$version is already on npm; nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       # No NODE_AUTH_TOKEN. With Trusted Publishing configured on npmjs.com for
       # this repository and workflow, npm mints a short-lived credential from the
       # OIDC token above. There is no long-lived secret to steal or phish, which
       # is how most recent npm supply-chain compromises started.
       - name: Publish
+        if: steps.published.outputs.skip == 'false'
         run: npm publish --access public --provenance

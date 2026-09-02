@@ -18,8 +18,9 @@
   "author": "crmackey",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/crmackey/shapefile-wasm.git"
+    "url": "git+https://github.com/CalebM1987/shapefile-wasm.git"
   },
+  "homepage": "https://calebm1987.github.io/shapefile-wasm/",
   "type": "module",
   "sideEffects": [
     "./dist/index.js"

@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Please report security issues privately through
-[GitHub Security Advisories](https://github.com/crmackey/shapefile-wasm/security/advisories/new)
+[GitHub Security Advisories](https://github.com/CalebM1987/shapefile-wasm/security/advisories/new)
 rather than opening a public issue.
 
 Include what you can: a description, the affected version, and a reproduction if

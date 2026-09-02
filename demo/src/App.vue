@@ -53,7 +53,7 @@ function onImported(imported: MapLayer[]): void {
       <ImportDropZone @imported="onImported" />
 
       <footer class="foot">
-        <a href="https://github.com/crmackey/shapefile-wasm">Source</a>
+        <a href="https://github.com/CalebM1987/shapefile-wasm">Source</a>
         ·
         <a href="https://www.npmjs.com/package/@crmackey/shapefile-wasm">npm</a>
       </footer>

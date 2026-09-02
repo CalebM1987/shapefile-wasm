@@ -98,7 +98,7 @@ setPanicHook();
 ```
 
 Then re-run. The message and a Rust stack go to `console.error`. Please
-[open an issue](https://github.com/crmackey/shapefile-wasm/issues) with it — a
+[open an issue](https://github.com/CalebM1987/shapefile-wasm/issues) with it — a
 panic is a bug, not a supported failure mode.
 
 ## Out of memory on a large dataset

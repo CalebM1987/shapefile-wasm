@@ -14,7 +14,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
 
 curl -sSf https://rustwasm.github.io/wasm-pack/installer/init.sh | sh
 
-git clone https://github.com/crmackey/shapefile-wasm
+git clone https://github.com/CalebM1987/shapefile-wasm
 cd shapefile-wasm
 pnpm install
 pnpm run build
