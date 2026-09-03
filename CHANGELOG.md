@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1](https://github.com/CalebM1987/shapefile-wasm/compare/v0.1.0...v0.1.1) (2026-09-03)
+
+
+### Bug fixes
+
+* correct the GitHub owner in every URL ([a9929b5](https://github.com/CalebM1987/shapefile-wasm/commit/a9929b5ec6640c2e544f7dc79603955f2814048e))
+
+
+### Documentation
+
+* add llms.txt for AI tooling ([ba5a2a8](https://github.com/CalebM1987/shapefile-wasm/commit/ba5a2a8fcc9da7f97d9596aa66cf708af320a161))
+* corrected broken link to docs ([3c3de11](https://github.com/CalebM1987/shapefile-wasm/commit/3c3de118effa4665fe5a3975410867f838a38aca))
+
 ## 0.1.0
 
 Initial release.
