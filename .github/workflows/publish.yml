@@ -1,8 +1,16 @@
 name: Publish
 
 on:
+  # Called by release-please.yml once it has created a release. This is the path
+  # that actually runs: a release created with the default GITHUB_TOKEN does not
+  # trigger workflows, which is GitHub's guard against recursive runs.
+  workflow_call:
+
+  # A release published by hand through the UI is a real user action, so it does
+  # trigger. Kept for that case.
   release:
     types: [published]
+
   workflow_dispatch:
 
 # Least privilege. `id-token: write` is what lets npm verify, via OIDC, that this

@@ -35,6 +35,20 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
+  # Called directly rather than left to the `release: published` event, which
+  # never arrives: release-please creates the release with the default
+  # GITHUB_TOKEN, and GitHub does not start new workflow runs from events that
+  # token produced. Calling the workflow keeps the publish automatic without a
+  # personal access token, which would mean storing a long-lived secret again.
+  publish:
+    name: Publish
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/publish.yml
+
   # release-please updates Cargo.toml but knows nothing about Cargo.lock, which
   # carries this crate's version too. Refresh it on the release branch so the
   # merged commit is internally consistent.
