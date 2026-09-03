@@ -8,6 +8,8 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  # To dispatch publish.yml once a release exists.
+  actions: write
 
 # Never race two release PRs against each other.
 concurrency:
@@ -35,19 +37,31 @@ jobs:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
 
-  # Called directly rather than left to the `release: published` event, which
-  # never arrives: release-please creates the release with the default
-  # GITHUB_TOKEN, and GitHub does not start new workflow runs from events that
-  # token produced. Calling the workflow keeps the publish automatic without a
-  # personal access token, which would mean storing a long-lived secret again.
+  # Publishing is *dispatched*, not called, and not left to the release event.
+  #
+  # - The `release: published` event never arrives, because GitHub does not start
+  #   workflow runs from events produced by the default GITHUB_TOKEN.
+  # - Calling publish.yml as a reusable workflow does run it, but the OIDC token
+  #   then names this workflow as the caller, and npm matches its trusted
+  #   publisher against that. It rejects the publish.
+  #
+  # workflow_dispatch is one of the two events GitHub explicitly exempts from the
+  # recursion guard, so dispatching starts a real run with publish.yml as the
+  # top-level workflow — which is what npm is configured for. No personal access
+  # token, so no long-lived secret.
   publish:
-    name: Publish
+    name: Dispatch publish
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
-    uses: ./.github/workflows/publish.yml
+      actions: write
+    steps:
+      - name: Dispatch publish.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: gh workflow run publish.yml --ref "${{ github.ref_name }}"
 
   # release-please updates Cargo.toml but knows nothing about Cargo.lock, which
   # carries this crate's version too. Refresh it on the release branch so the
