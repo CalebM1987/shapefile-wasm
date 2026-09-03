@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project uses
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.3](https://github.com/CalebM1987/shapefile-wasm/compare/v0.1.2...v0.1.3) (2026-09-03)
+
+
+### Bug fixes
+
+* **ci:** dispatch the publish workflow instead of calling it ([8e68fb0](https://github.com/CalebM1987/shapefile-wasm/commit/8e68fb07cdbf3f1bffa6777b7fb3e0e33ab0a17d))
+
 ## [0.1.2](https://github.com/CalebM1987/shapefile-wasm/compare/v0.1.1...v0.1.2) (2026-09-03)
 
 
