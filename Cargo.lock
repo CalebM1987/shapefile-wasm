@@ -45,7 +45,7 @@ dependencies = [
  "bufrw",
  "byteorder",
  "time",
- "yore",
+ "yore 1.4.0",
 ]
 
 [[package]]
@@ -249,7 +249,7 @@ dependencies = [
  "thiserror",
  "time",
  "wasm-bindgen",
- "yore",
+ "yore 2.1.1",
 ]
 
 [[package]]
@@ -376,6 +376,12 @@ name = "yore"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a7947b754c504609dca276b5904e1049423769126de1dcd8259d96b43a5a764"
+
+[[package]]
+name = "yore"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fb62c05420bd427bd71b7a78c963f3bff55a518e5827ccf1119b2c380ec9d2bb"
 
 [[package]]
 name = "zmij"
