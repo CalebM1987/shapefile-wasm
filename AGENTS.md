@@ -225,6 +225,12 @@ Edit the `CODES` list in `scripts/fetch-projections.mjs` and run
 `pnpm run projections`. The result is committed on purpose — the published
 package must never depend on epsg.io being reachable.
 
+**Changing the public API**
+
+Update `llms.txt` at the repository root too. It is hand-written, ships in the
+npm tarball, and is what AI tooling reads to learn the API surface and the
+format constraints. A stale one produces confidently wrong generated code.
+
 **Changing what the package ships**
 
 Update the `files` array in `package.json`, then verify with

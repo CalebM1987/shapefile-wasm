@@ -16,6 +16,10 @@
 /docs/reference/
 /docs/public/rustdoc/
 /docs/public/app/
+# Copied from the authored llms.txt at the repository root, plus the generated
+# concatenation of the guide.
+/docs/public/llms.txt
+/docs/public/llms-full.txt
 /demo/dist/
 # Mirrored from the root CHANGELOG.md, which release-please owns.
 /docs/guide/changelog.md

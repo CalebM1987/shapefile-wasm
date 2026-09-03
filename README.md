@@ -505,6 +505,20 @@ command is enough — there is no separate step to remember.
 > The Rust reference needs the Rust toolchain installed. Everything else builds
 > with Node alone — `pnpm run docs:api && npx vitepress dev docs` skips it.
 
+### llms.txt
+
+The site publishes [`/llms.txt`](https://calebm1987.github.io/shapefile-wasm/llms.txt)
+and [`/llms-full.txt`](https://calebm1987.github.io/shapefile-wasm/llms-full.txt)
+following the [llmstxt.org](https://llmstxt.org) convention, so AI tooling can
+pick up the API surface and — more importantly — the format constraints that
+decide whether generated code is actually correct.
+
+`llms.txt` is hand-written at the repository root and **also ships in the npm
+tarball**, so tools that read `node_modules` find it without a network request.
+`llms-full.txt` is the whole guide concatenated, generated at build time. A guide
+page not listed in the build script's reading order fails the build rather than
+being silently dropped.
+
 ### What it is assembled from
 
 | Part | Comes from | Script |
@@ -512,6 +526,7 @@ command is enough — there is no separate step to remember.
 | Guide | Hand-written markdown in `docs/guide/` | — |
 | TypeScript reference | TypeDoc, from the TSDoc comments in `src/` | `pnpm run docs:api` |
 | Rust reference | `cargo doc`, from the `///` comments in `rust/` | `pnpm run docs:rust` |
+| llms.txt | Hand-written `llms.txt`, plus the guide concatenated | `pnpm run docs:llms` |
 
 TypeDoc emits **markdown** rather than HTML, so the TypeScript reference renders
 as ordinary VitePress pages — themed like the guide and covered by the site's
@@ -618,6 +633,7 @@ the tagged Release triggers the publish.
 
 ```
 AGENTS.md             contributor guide: invariants, conventions, checks
+llms.txt              API surface and format constraints, for AI tooling
 SECURITY.md           security policy and supply-chain posture
 .githooks/            conventional-commit hook (no dependencies)
 

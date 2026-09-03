@@ -58,6 +58,7 @@
     "pkg/shapefile_wasm.d.ts",
     "pkg/shapefile_wasm_bg.wasm",
     "pkg/shapefile_wasm_bg.wasm.d.ts",
+    "llms.txt",
     "README.md",
     "LICENSE"
   ],
@@ -81,7 +82,8 @@
     "docs:dev": "pnpm run docs:api && pnpm run docs:rust:dev && pnpm run demo:build:dev && vitepress dev docs",
     "docs:build": "pnpm run docs:api && vitepress build docs && pnpm run docs:rust && pnpm run demo:build",
     "docs:preview": "vitepress preview docs",
-    "docs:api": "node scripts/sync-changelog.mjs && typedoc",
+    "docs:api": "node scripts/sync-changelog.mjs && node scripts/build-llms.mjs && typedoc",
+    "docs:llms": "node scripts/build-llms.mjs",
     "docs:rust": "node scripts/build-rust-docs.mjs",
     "docs:rust:dev": "node scripts/build-rust-docs.mjs --dev",
     "hooks:install": "node scripts/install-hooks.mjs",

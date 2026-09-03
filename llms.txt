@@ -1,0 +1,126 @@
+# @crmackey/shapefile-wasm
+
+> Read and write ESRI Shapefiles from GeoJSON, in the browser, in Node and in
+> workers. A Rust core compiled to WebAssembly with a typed TypeScript API.
+> No server round-trip, no GDAL, no native build step.
+
+Install with `npm install @crmackey/shapefile-wasm`. Requires Node 18+ or any
+browser with WebAssembly. The `.wasm` binary ships embedded, so there is nothing
+to copy, serve, or configure in a bundler.
+
+## Constraints that determine whether generated code is correct
+
+These are properties of the shapefile format, not of this library. Code that
+ignores them compiles and then produces wrong files.
+
+- **One geometry type per file.** A shapefile cannot hold points and polygons
+  together. Mixed input throws, naming the offending feature index. The single
+  exception: `Point` and `MultiPoint` are promoted to one `Multipoint` file.
+  For mixed data use `writeLayersZip`, which writes one shapefile per layer.
+- **`GeometryCollection` is not representable** and is rejected.
+- **Field names are capped at 11 bytes** by dBase. Longer names are truncated
+  and de-duplicated. Always read `parts.fields` to see the mapping — each entry
+  has `source` (original) and `name` (written).
+- **Character fields are capped at 254 bytes**; longer strings are truncated on
+  a character boundary.
+- **Coordinates are never reprojected.** `epsg` / `wkt` only write the `.prj`
+  that records which system the coordinates are already in. Use proj4js to
+  actually transform them.
+- **An unresolvable EPSG code throws** rather than silently omitting the `.prj`.
+- **Features with `null` geometry are skipped**, and counted in `skippedCount`.
+- **M (measure) values are dropped on read** unless `includeM: true` is passed,
+  because GeoJSON has no concept of measures.
+- **Text is always trimmed on read.** dBase pads character columns to a fixed
+  width and the underlying reader strips it; there is no option to keep it.
+
+## API
+
+No `init()` call is needed — the WebAssembly module is instantiated on first
+use. Every function is async except `zipParts` and `zipLayers`.
+
+From `@crmackey/shapefile-wasm`:
+
+- `writeShapefile(geojson, options?)` — GeoJSON to `{ shp, shx, dbf, cpg, prj?, shapeType, dimensions, featureCount, skippedCount, bbox, fields }`
+- `writeShapefileZip(geojson, options?)` — GeoJSON to a single zip as `Uint8Array`
+- `zipParts(parts, options?)` — pack already-generated components (synchronous)
+- `writeLayersZip(layers, options?)` — several layers to one archive; `layers` is `{ name, geojson, ...options }[]`
+- `writeLayers(layers, options?)` — convert a batch without packing, for per-layer metadata
+- `zipLayers(written, options?)` — pack the result of `writeLayers` (synchronous)
+- `readShapefile({ shp, dbf?, cpg?, prj? }, options?)` — components to a GeoJSON `FeatureCollection`
+- `readShapefileZip(archive, options?)` — a zip to `ShapefileLayer[]`, one per layer
+- `fetchProjection(epsg, options?)` — look up WKT from epsg.io over the network
+- `registerProjections(map)`, `getProjection(epsg)`, `registeredProjections()`, `loadProjectionTable()`
+- `init(source?)`, `isReady()` — only needed to control when the module loads
+
+From `@crmackey/shapefile-wasm/browser` (needs a DOM):
+
+- `downloadShapefileZip(geojson, options?)` — convert and save to the user's downloads
+- `readShapefileFile(file, options?)` — read a zip from a `File` or `Blob`
+- `triggerDownload(data, fileName, mimeType?)` — save arbitrary bytes
+
+Other entry points: `@crmackey/shapefile-wasm/slim` (same API, no embedded
+binary, requires `await init(url)` first) and
+`@crmackey/shapefile-wasm/projections` (the raw EPSG table).
+
+## Write options
+
+`shapeType` (`point` | `multipoint` | `polyline` | `polygon`, default inferred),
+`dimensions` (`auto` | `xy` | `xym` | `xyz` | `xyzm`, default `auto`),
+`maxFieldLength` (1-254, default 254), `epsg` (number), `wkt` (string, beats
+`epsg`), `fileName` (zip only), `level` (0-9 DEFLATE, zip only), and for
+`writeLayersZip` also `layout` (`flat` | `folders` | `nested`, default `flat`)
+and `folder` (a top-level directory inside the archive).
+
+## Read options
+
+`encoding` (defaults to the `.cpg`, then UTF-8; legacy code pages such as
+`cp1252`, `cp437`, `cp850` are supported) and `includeM` (default `false`).
+
+## Canonical example
+
+```ts
+import { writeLayersZip, readShapefileZip } from '@crmackey/shapefile-wasm';
+import { triggerDownload } from '@crmackey/shapefile-wasm/browser';
+
+// Mixed geometry needs one shapefile per type, which writeLayersZip handles.
+const zip = await writeLayersZip(
+  [
+    { name: 'Manholes', geojson: points },
+    { name: 'Pipes', geojson: lines },
+    { name: 'Basins', geojson: polygons },
+  ],
+  { epsg: 26915, layout: 'flat' },
+);
+
+triggerDownload(zip, 'network.zip');
+
+// And back again. One archive can hold several layers.
+const layers = await readShapefileZip(zip);
+for (const layer of layers) {
+  console.log(layer.name, layer.geojson.features.length, layer.prj);
+}
+```
+
+## Docs
+
+- [Guide](https://calebm1987.github.io/shapefile-wasm/guide/): overview and rationale
+- [Getting started](https://calebm1987.github.io/shapefile-wasm/guide/getting-started): install and first conversion
+- [Writing shapefiles](https://calebm1987.github.io/shapefile-wasm/guide/writing): input shapes, schema inference, errors
+- [Reading shapefiles](https://calebm1987.github.io/shapefile-wasm/guide/reading): archives, encodings, ring nesting
+- [Multiple layers](https://calebm1987.github.io/shapefile-wasm/guide/multiple-layers): batch export and archive layouts
+- [Projections](https://calebm1987.github.io/shapefile-wasm/guide/projections): EPSG codes, custom WKT, epsg.io lookup
+- [In the browser](https://calebm1987.github.io/shapefile-wasm/guide/browser): downloads, file pickers, workers, CSP
+- [Entry points](https://calebm1987.github.io/shapefile-wasm/guide/entry-points): root vs slim vs browser
+- [Format mapping](https://calebm1987.github.io/shapefile-wasm/guide/format-mapping): every GeoJSON to shapefile correspondence
+- [Known limits](https://calebm1987.github.io/shapefile-wasm/guide/limits): what the format and this package cannot do
+- [Troubleshooting](https://calebm1987.github.io/shapefile-wasm/guide/troubleshooting): error messages and their causes
+- [TypeScript API reference](https://calebm1987.github.io/shapefile-wasm/reference/): generated signatures
+- [Live demo](https://calebm1987.github.io/shapefile-wasm/demo): running application
+
+## Optional
+
+- [Architecture](https://calebm1987.github.io/shapefile-wasm/guide/architecture): why the code is shaped this way
+- [Development](https://calebm1987.github.io/shapefile-wasm/guide/development): building from source
+- [Testing](https://calebm1987.github.io/shapefile-wasm/guide/testing): the test strategy
+- [Rust API](https://calebm1987.github.io/shapefile-wasm/rust): the core crate, usable without the wasm bindings
+- [Full documentation as one file](https://calebm1987.github.io/shapefile-wasm/llms-full.txt)
