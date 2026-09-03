@@ -1,6 +1,6 @@
 {
   "name": "@crmackey/shapefile-wasm",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Read and write ESRI Shapefiles from GeoJSON in the browser, Node and workers. Rust core compiled to WebAssembly.",
   "keywords": [
     "shapefile",
